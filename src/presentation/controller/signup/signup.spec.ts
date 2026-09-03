@@ -6,7 +6,7 @@ import { ok, serverError, badRequest } from '../../helpers/http-helper'
 
 const makeEmailValidator = (): EmailValidator => {
   class EmailValidatorStub implements EmailValidator {
-    isValid(email: string): boolean {
+    isValid (email: string): boolean {
       return true
     }
   }
@@ -15,8 +15,8 @@ const makeEmailValidator = (): EmailValidator => {
 
 const makeAddAccount = (): AddAccount => {
   class AddAccountStub implements AddAccount {
-    async add(account: AddAccountModel): Promise<AccountModel> {
-      return new Promise(resolve => resolve(makeFakeAccount()))
+    async add (account: AddAccountModel): Promise<AccountModel> {
+      return await new Promise(resolve => { resolve(makeFakeAccount()) })
     }
   }
   return new AddAccountStub()
@@ -26,7 +26,7 @@ const makeFakeAccount = (): AccountModel => ({
   id: 'valid_id',
   name: 'valid_name',
   email: 'valid_email@mail.com',
-  password: 'valid_password',
+  password: 'valid_password'
 })
 
 const makeFakeRequest = (): HttpRequest => ({
@@ -148,7 +148,7 @@ describe('SignUp Controller', () => {
   test('Should return 500 if AddAccount throws', async () => {
     const { sut, addAccountStub } = makeSut()
     jest.spyOn(addAccountStub, 'add').mockImplementationOnce(async () => {
-      return new Promise((resolve, reject) => reject(new Error()))
+      return await new Promise((resolve, reject) => { reject(new Error()) })
     })
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(serverError(new ServerError(null)))
@@ -161,7 +161,7 @@ describe('SignUp Controller', () => {
     expect(addSpy).toHaveBeenCalledWith({
       name: 'any_name',
       email: 'any_email@mail.com',
-      password: 'any_password',
+      password: 'any_password'
     })
   })
 
@@ -169,6 +169,5 @@ describe('SignUp Controller', () => {
     const { sut } = makeSut()
     const httpResponse = await sut.handle(makeFakeRequest())
     expect(httpResponse).toEqual(ok(makeFakeAccount()))
-
   })
 })
